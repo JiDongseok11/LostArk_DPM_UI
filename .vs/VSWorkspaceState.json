@@ -2,11 +2,12 @@
   "ExpandedNodes": [
     "",
     "\\db\\characters",
-    "\\db\\skills",
     "\\pyqt5",
+    "\\src",
     "\\src\\layers",
-    "\\src\\layers\\dynamic"
+    "\\src\\layers\\dynamic",
+    "\\src\\layers\\static"
   ],
-  "SelectedNode": "\\pyqt5\\lostark_sim.py",
+  "SelectedNode": "\\pyqt5\\saved_json.json",
   "PreviewInSolutionExplorer": false
 }

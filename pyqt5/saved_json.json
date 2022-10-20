@@ -1,19 +1,22 @@
 {
 	"character_settings": [
 		{
-			"class_name": "demonic",
-			"upgrade": 0,
-			"crit": 0,
-			"specialization": 0,
-			"swiftness": 0,
+			"class_name": "destroyer",
+			"upgrade": 25,
+			"crit": 100,
+			"specialization": 200,
+			"swiftness": 1900,
 			"engravings": [
 				"Synergy_Head_Back",
-				"Synergy_Crit_B"
+				"Spirit_Absorption_1",
+				"Card_\uc138\uad6c_18",
+				"Ether_Predator_1",
+				"Master_Of_Ambush_2"
 			],
 			"artifact_set": [
-				"\uc545\ubabdA_6_3"
+				"\uc545\ubabdA_6_2"
 			],
-			"skill_set": "../db/skills/demonic_perfect_suppression.json"
+			"skill_set": "../db/skills/destroyer_rage_hammer.json"
 		}
 	]
 }

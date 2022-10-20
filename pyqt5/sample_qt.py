@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import os
 import json
 
 from PyQt5.QtWidgets import *
@@ -7,16 +8,14 @@ from PyQt5 import uic
 
 from lostark_sim import lostark_sim
 
-CLASSNAME_LIST = ["class1", "class2", "class3"]
-ARTIFACT_LIST = ["artifact1", "artifact2", "artifact3"]
-ENGRAVING_LIST = ["engrave1", 'engrave2', "engrave3", "engrave4", "engrave5", "engrave6"]
-
 CHARACTER_SETTING_FILEPATH = '../DB/character_settings.json'
+ui_path = os.path.dirname(os.path.abspath(__file__))
+setting_form_class = uic.loadUiType(os.path.join(ui_path, "sample.ui"))[0]
+result_form_class = uic.loadUiType(os.path.join(ui_path, "sample_result.ui"))[0]
 
-setting_form_class = uic.loadUiType("sample.ui")[0]
-result_form_class = uic.loadUiType("sample_result.ui")[0]
+MAX_STAT_SUM = 2200
 
-class SettingWindowClass(QDialog, setting_form_class) :
+class SettingWindowClass(QDialog, setting_form_class):
     def __init__(self) :
         super().__init__()
         self.setupUi(self)
@@ -24,11 +23,12 @@ class SettingWindowClass(QDialog, setting_form_class) :
 
         self.lostark_sim = lostark_sim()
         self.flag = False
+        #self.remain_stat = MAX_STAT_SUM
 
         with open(CHARACTER_SETTING_FILEPATH, 'r') as load_file:
             self.loaded_data = json.load(load_file)
         self.character_setting_keys = list(self.loaded_data['character_settings'][0].keys())
-        
+
         self.result_dict = dict()
 
         self.set_elements_enable(False)
@@ -45,6 +45,9 @@ class SettingWindowClass(QDialog, setting_form_class) :
         self.engraving_CB4.currentIndexChanged.connect(lambda: self.engraving_selected_func('4'))
         self.engraving_CB5.currentIndexChanged.connect(lambda: self.engraving_selected_func('5'))
         self.engraving_CB6.currentIndexChanged.connect(lambda: self.engraving_selected_func('6'))
+        self.stat_SB2.valueChanged.connect(lambda: self.stat_changed_func('2'))
+        self.stat_SB3.valueChanged.connect(lambda: self.stat_changed_func('3'))
+        self.stat_SB4.valueChanged.connect(lambda: self.stat_changed_func('4'))
 
     def set_elements_enable(self, bool):
         self.artifact_CB.setEnabled(bool)
@@ -64,6 +67,7 @@ class SettingWindowClass(QDialog, setting_form_class) :
             self.set_elements_enable(True)
             self.update_artifact_CB()
             self.update_engraving_CB()    
+            self.init_stat_SB()
 
     def artifact_selected_func(self):
         selected_index = self.artifact_CB.currentIndex()
@@ -78,8 +82,15 @@ class SettingWindowClass(QDialog, setting_form_class) :
         if selected_index == 0:
             return True
         else:
+            self.update_engraving_CB()
             print(f"{getattr(self, 'engraving_CB'+index).currentText()} engraving has selected as engraving "+index)
-        
+      
+    def stat_changed_func(self, changed_index):
+        remains = self.update_remain_stat()
+        index_list = ['2', '3', '4']
+        for index in index_list:
+            getattr(self, 'stat_SB'+index).setRange(0, remains + self.get_stat_SB_value(index))
+
     def generate_class_CB(self):
         self.class_CB.addItem("Choose class")
         classnames = self.lostark_sim.get_character_file_names()
@@ -101,20 +112,40 @@ class SettingWindowClass(QDialog, setting_form_class) :
             for engraving in engravings:
                 getattr(self, 'engraving_CB'+str(i+1)).addItem(engraving)
 
+    def init_stat_SB(self):
+        self.stat_SB1.setRange(0, 25)
+        for i in range(3):
+            getattr(self, 'stat_SB'+str(i+2)).setRange(0, MAX_STAT_SUM)
+        self.remain_stat_L.setText("Remaining Stat: 2200pt")
+
     def update_artifact_CB(self):
         if self.artifact_CB.count():
             return True
         else:
             self.generate_artifact_CB()
 
-    def update_engraving_CB(self):
+    def update_engraving_CB(self, index = 0):
         if self.engraving_CB1.count():
             return True
         else:
             self.generate_engraving_CB()
 
+    def update_remain_stat(self):
+        remain = MAX_STAT_SUM
+        for i in range(3):
+            remain -= self.get_stat_SB_value(i+2)
+        self.remain_stat_L.setText(f"Remaining Stat: {remain}pt")
+        return remain
+
     def get_stat_SB_value(self, index):
         return getattr(self, 'stat_SB'+str(index)).value()
+
+    def get_current_engravings_list(self):
+        current_engravings = []
+        for i in range(6):
+            if getattr(self, 'engraving_CB'+str(i+1)).currentIndex() != 0:
+                current_engravings.append(getattr(self, 'engraving_CB'+str(i+1)).currentText())
+        return current_engravings
 
     def clear_elements(self):
         print("element clear")
@@ -125,9 +156,7 @@ class SettingWindowClass(QDialog, setting_form_class) :
             self.add_character_setting(self.character_setting_keys[0], self.lostark_sim.get_one_character_name(f"character_{self.class_CB.currentText()}.json"))
             for i in range(4):
                 self.add_character_setting(self.character_setting_keys[i+1], getattr(self, 'stat_SB'+str(i+1)).value())
-            for i in range(6):
-                if getattr(self, 'engraving_CB'+str(i+1)).currentIndex() != 0:
-                    self.add_character_setting(self.character_setting_keys[5], getattr(self, 'engraving_CB'+str(i+1)).currentText())
+            self.add_character_setting(self.character_setting_keys[5], self.get_current_engravings_list())
             #self.add_character_setting(self.character_setting_keys[6], None)
             self.add_character_setting(self.character_setting_keys[7], self.artifact_CB.currentText())
             self.add_character_setting(self.character_setting_keys[8],skill_set_path)
@@ -153,7 +182,7 @@ class SettingWindowClass(QDialog, setting_form_class) :
             else:
                 self.result_dict[key] = value
         except:
-            if key == "engravings" or key == "options" or key == "artifact_set":
+            if key == "options" or key == "artifact_set":
                 temp_value = []
                 temp_value.append(value)
                 self.result_dict.setdefault(key, temp_value)
