@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\db",
+    "\\db\\characters",
+    "\\db\\skills",
+    "\\src",
+    "\\src\\layers",
+    "\\src\\layers\\dynamic"
+  ],
+  "SelectedNode": "\\sample_qt.py",
+  "PreviewInSolutionExplorer": false
+}
