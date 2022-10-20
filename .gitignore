@@ -3,7 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+.vs
 .vs/
+.idea
 .idea/
 
 # C extensions
