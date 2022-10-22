@@ -47,4 +47,7 @@ class lostark_sim():
         for setting in character_json['character_settings']:
             self.simulator = DpmSimulator(self.get_character_dict(setting), verbose=False)
             self.simulator.run_simulation()
-            self.simulator.print_result()
+        return True
+
+    def print_simulation_result(self):
+        self.simulator.print_result()
