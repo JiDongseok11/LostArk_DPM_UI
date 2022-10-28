@@ -26,9 +26,9 @@ class lostark_sim():
             load_json = json.load(load_file)
             return load_json["character_settings"][0]["class_name"]
 
-    def get_character_configs(self, character_file_name):
-        character_configs = import_character(characters_root_path + character_file_name)
-        return character_configs
+    #def get_character_configs(self, character_file_name):
+    #    character_configs = import_character(self.characters_root_path + character_file_name)
+    #    return character_configs
 
     def get_character_dict(self, character_dict):
         character_factory = CharacterFactory(**character_dict)
@@ -51,3 +51,6 @@ class lostark_sim():
 
     def print_simulation_result(self):
         self.simulator.print_result()
+
+    def get_result(self):
+        return self.simulator.get_result()
